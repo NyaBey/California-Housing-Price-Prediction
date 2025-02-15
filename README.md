@@ -1,58 +1,134 @@
-# California-Housing-Price-Prediction
-A machine learning model to predict housing prices using Random Forest
-This project aims to predict housing prices in California using Machine Learning techniques. The dataset is sourced from Kaggle and includes features like location, number of rooms, population, median income, and proximity to the ocean.
+# import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
-We built multiple models, including Linear Regression and Random Forest, and found that Random Forest performed significantly better with an R² score of 0.8075.
-The structure
-California-Housing-Price-Prediction/
-│-- data/
-│   ├── housing.csv   # Raw dataset
-│-- models/
-│   ├── housing_price_model.pkl   # Saved trained model
-│-- notebooks/
-│   ├── EDA.ipynb    # Exploratory Data Analysis
-│   ├── Model_Training.ipynb    # Model training & evaluation
-│-- scripts/
-│   ├── preprocess.py    # Data preprocessing script
-│   ├── train_model.py    # Model training script
-│-- README.md    # Project documentation
+# Load the dataset
+housing_data = pd.read_csv(r"C:\Users\yunia\OneDrive\Dokumente\DS PROJECTS PY\California Housing Price Pred.zip")  
+# Ensure the correct file path
 
-Dataset
-The dataset contains 20,640 records with the following key features:
+# Check for missing values
+missing_values = housing_data.isnull().sum()
 
-longitude, latitude → Geographic location
+# Generate summary statistics
+summary_stats = housing_data.describe()
 
-housing_median_age → Age of the house
+# Visualizing missing values
+plt.figure(figsize=(8, 4))
+sns.heatmap(housing_data.isnull(), cmap="viridis", cbar=False)
+plt.title("Missing Values in the Dataset")
+plt.show()
 
-total_rooms, total_bedrooms → House size
+# Display the summary statistics
+print(housing_data.describe())  # Prints summary stats in the terminal
 
-population, households → Area demographics
+# Show missing values count
+missing_values
 
-median_income → Economic factor
+# Clean and prepare dataset
 
-ocean_proximity → Categorical location feature
+from sklearn.preprocessing import LabelEncoder
 
-median_house_value → Target variable (House Price)
-The model Performance
-Linear Regression 
-Model Evaluation Metrics:
- Mean Absolute Error (MAE): 51820.75
- Mean Squared Error (MSE): 5062019613.46
-R² Score: 0.6137
+# Fill missing values in 'total_bedrooms' with median
+housing_data['total_bedrooms'].fillna(housing_data['total_bedrooms'].median(), inplace=True)
 
-Random Forest Model Metrics:
- MAE: 32156.73
- MSE: 2523161074.32
- R² Score: 0.8075
- Random Forest outperforms LR model by having a lower error margin and a higher accuracy
+# Convert categorical 'ocean_proximity' into numerical values
+label_encoder = LabelEncoder()
+housing_data['ocean_proximity'] = label_encoder.fit_transform(housing_data['ocean_proximity'])
 
- Usage requires
- 1. installation of the dependencies
- pip install -r requirements.txt 
- 2. run data preprocessing
-    python scripts/preprocess.py
-3. Train the model
-4. Make predictions
-5. Evaluate and visualize
- 6. 
- 
+# Confirm changes
+housing_data.info(), housing_data.head()
+
+print("Preprocessing done! Here's the first 5 rows:")
+print(housing_data.head())  # Show first 5 rows
+print(housing_data.isnull().sum())  # Show missing values count
+
+from sklearn.model_selection import train_test_split
+
+# Define features (X) and target variable (y)
+X = housing_data.drop(columns=["median_house_value"])  # All columns except target
+y = housing_data["median_house_value"]  # Target variable
+
+# Split the data (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Confirm split sizes
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+print("Script started...")  
+
+from sklearn.linear_model import LinearRegression
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# Initialize and train the model
+lin_reg = LinearRegression()
+lin_reg.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = lin_reg.predict(X_test)
+
+# Train the model
+lin_reg.fit(X_train, y_train)
+
+# Calculate evaluation metrics
+mae = mean_absolute_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+# Get model coefficients
+lin_reg.coef_, lin_reg.intercept_
+
+print("📊 Model Evaluation Metrics:")
+print(f"✔️ Mean Absolute Error (MAE): {mae:.2f}")
+print(f"✔️ Mean Squared Error (MSE): {mse:.2f}")
+print(f"✔️ R² Score: {r2:.4f}")  # Higher is better, ranges from 0 to 1
+
+from sklearn.ensemble import RandomForestRegressor
+
+# Initialize and train Random Forest
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Make predictions
+rf_pred = rf_model.predict(X_test)
+
+# Evaluate
+rf_mae = mean_absolute_error(y_test, rf_pred)
+rf_mse = mean_squared_error(y_test, rf_pred)
+rf_r2 = r2_score(y_test, rf_pred)
+
+print("\n🌳 Random Forest Model Metrics:")
+print(f"✔️ MAE: {rf_mae:.2f}")
+print(f"✔️ MSE: {rf_mse:.2f}")
+print(f"✔️ R² Score: {rf_r2:.4f}")
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Get feature importance
+feature_importance = rf_model.feature_importances_
+features = X_train.columns
+
+# Plot feature importance
+plt.figure(figsize=(10, 6))
+plt.barh(features, feature_importance, color="skyblue")
+plt.xlabel("Feature Importance Score")
+plt.ylabel("Features")
+plt.title("Feature Importance in Random Forest Model")
+plt.show()
+
+from sklearn.model_selection import GridSearchCV
+
+# Define parameter grid
+param_grid = {
+    "n_estimators": [100, 200],
+    "max_depth": [10, 20, None],
+    "min_samples_split": [2, 5, 10]
+}
+
+# Perform Grid Search
+grid_search = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=3, scoring="r2", n_jobs=-1)
+grid_search.fit(X_train, y_train)
+
+# Best parameters
+print("Best Parameters:", grid_search.best_params_)
