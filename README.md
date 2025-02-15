@@ -33,26 +33,27 @@ median_income → Economic factor
 ocean_proximity → Categorical location feature
 
 median_house_value → Target variable (House Price)
-The model Performance
-Linear Regression 
+
+The model Performance:
+1. Linear Regression 
 Model Evaluation Metrics:
  Mean Absolute Error (MAE): 51820.75
  Mean Squared Error (MSE): 5062019613.46
-R² Score: 0.6137
+ R² Score: 0.6137
 
-Random Forest Model Metrics:
+2. Random Forest Model Metrics:
  MAE: 32156.73
  MSE: 2523161074.32
  R² Score: 0.8075
- Random Forest outperforms LR model by having a lower error margin and a higher accuracy
+The Random Forest outperforms LR model by having a lower error margin and a higher accuracy
 
- Usage requires
+Usage requires
  1. installation of the dependencies
- pip install -r requirements.txt 
+    pip install -r requirements.txt 
  2. run data preprocessing
     python scripts/preprocess.py
-3. Train the model
-4. Make predictions
-5. Evaluate
+ 3. Train the model
+ 4. Make predictions
+ 5. Evaluate
  6. Visualize
  
