@@ -53,6 +53,6 @@ Random Forest Model Metrics:
     python scripts/preprocess.py
 3. Train the model
 4. Make predictions
-5. Evaluate and visualize
- 6. 
+5. Evaluate
+ 6. Visualize
  
