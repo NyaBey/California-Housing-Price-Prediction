@@ -79,17 +79,3 @@ Deploy the Model: Create a Flask or Streamlit app
  
 ---
 
-### **What’s Fixed?**
-**Proper folder structure formatting**  
-**Code blocks wrapped properly**  
-**Markdown formatting fixed for better readability**  
-**Extra lines for correct spacing on GitHub**  
-
-### **Next Steps**
-1**Replace your current `README.md` with this corrected version.**  
-2️**Commit & Push to GitHub:**  
-```bash
-git add README.md
-git commit -m "Updated README formatting"
-git push origin main
-
